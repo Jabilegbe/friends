@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/materialize/css/materialize.min.css">
+    <title>Friends</title>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <h4 class="card-title" style="display: inline-block;">Friends</h4>
+                    <span class="btn" style="display: inline-block;">+</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <div id="main" class="card">
+                        <div class="card-content">
+                            <span class="card-title">Friends List</span>
+                            <div class="row">
+                                <form id="search-form">
+                                    <div class="input-field col s12">
+                                        <input type="text" name="search-query" id="search-query">
+                                        <label for="search-query">Search friends</label>
+                                    </div>
+                                    <input type="submit" value="Search" class="btn">
+                                </form>
+                            </div>
+                        </div>
+                        <!-- top form-->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h3 v-if="!friends.length"> You have no friends yet</h3>
+
+                <div class="col s12" id="friend-list">
+                    <friend 
+                    v-for="(friend, index) in friends"
+                    :friend="friend"
+                    :key="index"
+                    @remove-friend="friends.splice(index, 1)"
+                    > </friend>
+               </div>
+            </div>
+            <footer class="row">
+                <stats :no-of-friends="noOfFriends"> </stats>
+                <div class="col s12">
+                    CodeByWaju 
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <template type="text/x-template" id="friend-template"> 
+        
+                <div class="card friend">                  
+                    <div class="card-content">
+                        <template v-if="isEditing">
+                            <div class="input-field col s6">
+                                <input type="text" v-model="friend.name" class="friend-name">
+                            </div>
+                            <div class="input-field col s6">
+                                    <input type="text" v-model="friend.location" class="friend-location">
+                            </div>
+                            <div class="input-field col s12">
+                                <textarea class="materialize-textarea">
+                                    {{ friend.description }}
+                                </textarea>
+                            </div>
+                            <div class="input-field col s4">
+                                <label for="male">
+                                    <input type="radio" id="male" v-model="friend.gender" value="male"> <span>Male</span>
+                                </label>
+                            </div>
+                            <div class="input-field col s4">
+                                <label for="female">
+                                    <input type="radio" id="female"  v-model="friend.gender" value="female">
+                                    <span >Female</span>
+                                </label>
+                            </div>
+                            
+                       </template>
+                        <br>
+                        <template v-if="!isEditing">
+                            <p class="name card-title">{{ friend.name }} <small class="gender">({{ friend.gender }})</small></p>
+                            <p class="location">Location: {{ friend.location }} </p>
+                            <p class="detail">
+                                {{ friend.description }}
+                            </p>
+                        </template>
+                        <br>
+                        <div class="action">
+                            <button v-if="isEditing"  @click="friendEdited" class="btn">Save</button>
+                            <button v-if="!isEditing" class="btn" @click="editFriend">Edit</button> <button class="btn" @click="removeFriend(friend)">&times;</button>
+                        </div>
+                    </div>
+                </div>
+      </template>
+      <template type="text/x-template" id="stats-template">
+        <div class="col s12">
+            <p class="text-align:center;">You have {{ noOfFriends }} friends</p>
+        </div>
+      </template>
+    
+    <script src="materialize/jquery.min.js"></script>
+    <script src="materialize/js/materialize.min.js"></script>
+    <script src="vue.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
