@@ -6,16 +6,65 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="/materialize/css/materialize.min.css">
     <title>Friends</title>
+    <style>
+        [v-cloak] {
+        display: none;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <div class="container">
+        <div class="container" v-cloak>
+            
             <div class="row">
                 <div class="col s12">
                     <h4 class="card-title" style="display: inline-block;">Friends</h4>
-                    <span class="btn" style="display: inline-block;">+</span>
+                    <span class="btn" style="display: inline-block;" @click="addingFriend = true">+</span>
                 </div>
             </div>
+            <template v-if="addingFriend">
+                <div class="row">
+                    <div class="col s12">
+                        <div class="card">
+                            <div class="card-content">
+                                <span class="card-title">Add New Friend</span>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                            <input type="text" v-model.trim="newFriend.name" class="friend-name">
+                                            <label>Name</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                            <input type="text" v-model.trim="newFriend.location" class="friend-location">
+                                            <label>Location</label>
+
+                                    </div>
+                                    <div class="input-field col s12">
+                                        <textarea class="materialize-textarea" id="editedDescription" v-model="newFriend.description">
+                                            {{ newFriend.description.trim() }}
+                                        </textarea>
+                                        <label>Describe them/label>
+
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <label for="male">
+                                            <input type="radio" id="male" v-model="newFriend.gender" value="male"> <span>Male</span>
+                                        </label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <label for="female">
+                                            <input type="radio" id="female"  v-model="newFriend.gender" value="female">
+                                            <span >Female</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <br>
+                                <input type="submit" @click.prevent="addFriend(newFriend)" value="Save" class="btn">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <!-- /Adding new-friend -->
             <div class="row">
                 <div class="col s12">
                     <div id="main" class="card">
@@ -40,10 +89,12 @@
 
                 <div class="col s12" id="friend-list">
                     <friend 
-                    v-for="(friend, index) in friends"
+                    v-for="(friend, index) in orderedFriends"
                     :friend="friend"
                     :key="index"
+                    :index="index"
                     @remove-friend="friends.splice(index, 1)"
+                    @friend-edited="updateFriend"
                     > </friend>
                </div>
             </div>
@@ -61,29 +112,30 @@
                 <div class="card friend">                  
                     <div class="card-content">
                         <template v-if="isEditing">
-                            <div class="input-field col s6">
-                                <input type="text" v-model="friend.name" class="friend-name">
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <input type="text" v-model.trim="friend.name" class="friend-name">
+                                </div>
+                                <div class="input-field col s6">
+                                        <input type="text" v-model.trim="friend.location" class="friend-location">
+                                </div>
+                                <div class="input-field col s12">
+                                    <textarea class="materialize-textarea" id="editedDescription" v-model="friend.description">
+                                        {{ friend.description.trim() }}
+                                    </textarea>
+                                </div>
+                                <div class="input-field col s6">
+                                    <label for="male">
+                                        <input type="radio" id="male" v-model="friend.gender" value="male"> <span>Male</span>
+                                    </label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <label for="female">
+                                        <input type="radio" id="female"  v-model="friend.gender" value="female">
+                                        <span >Female</span>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="input-field col s6">
-                                    <input type="text" v-model="friend.location" class="friend-location">
-                            </div>
-                            <div class="input-field col s12">
-                                <textarea class="materialize-textarea">
-                                    {{ friend.description }}
-                                </textarea>
-                            </div>
-                            <div class="input-field col s4">
-                                <label for="male">
-                                    <input type="radio" id="male" v-model="friend.gender" value="male"> <span>Male</span>
-                                </label>
-                            </div>
-                            <div class="input-field col s4">
-                                <label for="female">
-                                    <input type="radio" id="female"  v-model="friend.gender" value="female">
-                                    <span >Female</span>
-                                </label>
-                            </div>
-                            
                        </template>
                         <br>
                         <template v-if="!isEditing">
@@ -96,7 +148,7 @@
                         <br>
                         <div class="action">
                             <button v-if="isEditing"  @click="friendEdited" class="btn">Save</button>
-                            <button v-if="!isEditing" class="btn" @click="editFriend">Edit</button> <button class="btn" @click="removeFriend(friend)">&times;</button>
+                            <button v-if="!isEditing" class="btn" @click="isEditing = true">Edit</button> <button class="btn" @click="removeFriend(friend)">&times;</button>
                         </div>
                     </div>
                 </div>
