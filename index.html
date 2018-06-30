@@ -42,7 +42,7 @@
                                         <textarea class="materialize-textarea" id="editedDescription" v-model="newFriend.description">
                                             {{ newFriend.description.trim() }}
                                         </textarea>
-                                        <label>Describe them/label>
+                                        <label>Describe them</label>
 
                                     </div>
                                     <div class="input-field col s6">
@@ -73,10 +73,10 @@
                             <div class="row">
                                 <form id="search-form">
                                     <div class="input-field col s12">
-                                        <input type="text" name="search-query" id="search-query">
+                                        <input type="text" name="search-query" v-model.trim="filter" id="search-query">
                                         <label for="search-query">Search friends</label>
                                     </div>
-                                    <input type="submit" value="Search" class="btn">
+                                   <p v-if="filter.length"> Matches {{ filteredFriends.length | pluralize }} </p>
                                 </form>
                             </div>
                         </div>
@@ -89,7 +89,7 @@
 
                 <div class="col s12" id="friend-list">
                     <friend 
-                    v-for="(friend, index) in orderedFriends"
+                    v-for="(friend, index) in filteredFriends"
                     :friend="friend"
                     :key="index"
                     :index="index"
@@ -155,7 +155,7 @@
       </template>
       <template type="text/x-template" id="stats-template">
         <div class="col s12">
-            <p class="text-align:center;">You have {{ noOfFriends }} friends</p>
+            <p class="text-align:center;">You have {{ noOfFriends | pluralize  }}</p>
         </div>
       </template>
     

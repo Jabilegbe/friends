@@ -1,3 +1,16 @@
+// pluarize mixin
+const mix = {
+    filters: {
+        pluralize: function(value){
+            if(value === 0){
+                return
+            }
+            let qualifier = value == 1 ? 'friend' : 'friends';
+            return `${value} ${qualifier}`;
+        }
+    }
+}
+
 //friend component
 Vue.component('friend', {
     props : {
@@ -28,7 +41,8 @@ Vue.component('friend', {
         removeFriend : function(friend){
             this.$emit('remove-friend', friend);
         }
-    }
+    },
+    mixins : [ mix ]
 });
 
 // stats component
@@ -37,13 +51,27 @@ Vue.component('stats', {
         noOfFriends : Number,
     },
     template: '#stats-template',
+    mixins : [ mix ],
 });
 
 // vm
 const vm = new Vue({
     el : "#app",
     data : {
-        friends: [],
+        friends: [
+            {
+                name: 'Ojezel Ofure Peace',
+                gender: 'female',
+                location: 'Warri',
+                description: 'Ome'
+            },
+            {
+                name: 'Abolarin Oluwasegun Victor',
+                gender: 'male',
+                location: 'Abuja',
+                description: 'My brother'
+            },
+        ],
         addingFriend: false,
         newFriend : {
             name: '',
@@ -51,6 +79,7 @@ const vm = new Vue({
             location: '',
             description: ''
         },
+        filter: '',
     },
     methods: {
        updateFriend: function(payload){
@@ -60,29 +89,32 @@ const vm = new Vue({
        },
        addFriend : function(newFriend){
         //    must make a shallow copy of the reactive object if i am going to clean it up after saving;
-        const friend =  {};
-        friend.name = newFriend.name;
-        friend.gender = newFriend.gender;
-        friend.location = newFriend.location;
-        friend.description = newFriend.description;
+        const friend =  Object.assign({}, newFriend);
 
         this.friends.push(friend);
-        this.newFriend.name = '';
-        this.newFriend.location ='';
-        this.newFriend.gender ='';
-        this.newFriend.description ='';
+        // clean out the object
+        for(let key of ['name', 'location', 'gender', 'description']) this.newFriend[key] =''; 
 
         this.addingFriend = false;
     
         },
-
+        order: function(group){
+            return group.slice(0).reverse();
+        },
+      
     },
     computed : {
         noOfFriends : function(){
             return this.friends.length;
         },
-        orderedFriends: function(){
-            return this.friends.slice(0).reverse()
+        filteredFriends: function(){
+            let group = this.friends;
+            if(this.filter){
+                group = group.filter((friend, index) => {
+                    return friend.name.toLowerCase().includes(this.filter) ||  friend.location.toLowerCase().includes(this.filter) ||  friend.gender.toLowerCase().includes(this.filter) ||  friend.description.toLowerCase().includes(this.filter);
+                })
+            }
+            return this.order(group);
         }
     }
 })
